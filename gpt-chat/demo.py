@@ -1,21 +1,22 @@
 from openai import OpenAI
-from model import gpt_robot
 import time
+import json
 import os
-from wxauto import WeChat
+import sys
+with open('config.json', 'r', encoding='utf-8') as config_file:
+    config = json.load(config_file)
+sys.path.append(config['sys_path'])
+from model import gpt_robot
+from wxauto.wxauto import WeChat
 
 os.chdir(os.path.dirname(__file__))#设置当前文件夹为工作目录
 
 # 设置API密钥，若已经添加到环境变量中，可注释掉这一行
-os.environ['OPENAI_API_KEY'] = 'Your_API_Key'
-
+os.environ['OPENAI_API_KEY'] = config['openai_api_key']
 wx = WeChat()
 
 #创建一个人/群聊列表
-human_group_info_list = [
-    {'name': 'groups', 'condition': '@myself', 'condition_type': 1, 'role_file': 'role/kobe.txt', 'pretrained_file': 'pretrained/kobe_1.txt'},
-    {'name': 'human', 'condition': '', 'condition_type': 0, 'role_file': 'role/kobe.txt', 'pretrained_file': 'pretrained/kobe_1.txt'}
-]
+human_group_info_list = config['human_group_info_list']
 
 # name: 群组/人名称
 # condition: 触发对话时，对方信息必须含有的关键词
@@ -24,11 +25,9 @@ human_group_info_list = [
 # pretrained_file: 预训练对话集路径
 
 
+
 client = OpenAI()
-gpt_models = ['gpt-4', 
-		  'gpt-4-turbo-preview',
-		  'gpt-3.5-turbo'
-		  ]
+gpt_models = config['gpt_models']
 gpt_model = gpt_models[1]#选择模型
 
 
